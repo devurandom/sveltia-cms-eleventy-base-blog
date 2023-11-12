@@ -1,0 +1,12 @@
+---
+layout: layouts/base.njk
+---
+<h1>{{ name }}</h1>
+
+{{ content | safe }}
+
+{% set postslist = collections.posts | getPostsByAuthor(name) %}
+{%- if postslist %}
+<p>Posts by {{ name }}:</p>
+{% include "postslist.njk" %}
+{%- endif %}

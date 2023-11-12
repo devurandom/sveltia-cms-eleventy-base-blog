@@ -1,0 +1,13 @@
+---
+layout: layouts/home.njk
+eleventyNavigation:
+  key: Authors
+  order: 3
+---
+<h1>Authors</h1>
+
+<ul>
+{% for author in collections.authors %}
+	<li><a href="{{ author.url }}" class="post-author">{{ author.data.name }}</a></li>
+{% endfor %}
+</ul>

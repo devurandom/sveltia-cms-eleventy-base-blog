@@ -1,3 +1,4 @@
+const yaml = require("js-yaml");
 const { DateTime } = require("luxon");
 const markdownItAnchor = require("markdown-it-anchor");
 
@@ -11,11 +12,15 @@ const pluginDrafts = require("./eleventy.config.drafts.js");
 const pluginImages = require("./eleventy.config.images.js");
 
 module.exports = function(eleventyConfig) {
+	// Add support for YAML data files with .yml extension
+	eleventyConfig.addDataExtension("yml", contents => yaml.load(contents));
+
 	// Copy the contents of the `public` folder to the output folder
 	// For example, `./public/css/` ends up in `_site/css/`
 	eleventyConfig.addPassthroughCopy({
 		"./public/": "/",
-		"./node_modules/prismjs/themes/prism-okaidia.css": "/css/prism-okaidia.css"
+		"./node_modules/prismjs/themes/prism-okaidia.css": "/css/prism-okaidia.css",
+		"./admin/": "/admin"
 	});
 
 	// Run Eleventy when these files change:
@@ -66,7 +71,7 @@ module.exports = function(eleventyConfig) {
 	});
 
 	// Return all the tags used in a collection
-	eleventyConfig.addFilter("getAllTags", collection => {
+	eleventyConfig.addFilter("getAllTags", (collection) => {
 		let tagSet = new Set();
 		for(let item of collection) {
 			(item.data.tags || []).forEach(tag => tagSet.add(tag));
@@ -77,6 +82,11 @@ module.exports = function(eleventyConfig) {
 	eleventyConfig.addFilter("filterTagList", function filterTagList(tags) {
 		return (tags || []).filter(tag => ["all", "nav", "post", "posts"].indexOf(tag) === -1);
 	});
+
+	// Return all the tags used in a collection
+	eleventyConfig.addFilter("getPostsByAuthor", (collection, authorName) =>
+		collection.filter(({ data: { author } }) => author === authorName)
+	);
 
 	// Customize Markdown library settings:
 	eleventyConfig.amendLibrary("md", mdLib => {
